@@ -14,3 +14,5 @@ kubectl exec -it redis-client -- bash
 REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli -h redis-cluster-master
 REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli -h redis-cluster-replicas
 ```
+
+https://artifacthub.io/packages/helm/bitnami/redis
