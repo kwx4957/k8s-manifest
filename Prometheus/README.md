@@ -44,9 +44,21 @@ grafana:
 
 helm install prometheus-stack prometheus-community/kube-prometheus-stack --version 69.2.4 -f values.yaml -n monitoring
 
-export GRAFANA_PASSWORD=$(kubectl get secret prometheus-stack-grafana -n monitoring -o jsonpath="{.data.username}" | base64 -d)
+export GRAFANA_PASSWORD=$(kubectl get secret prometheus-stack-grafana -n monitoring -o jsonpath="{.data.admin-password}" | base64 -d)
 echo $GRAFANA_PASSWORD
 ```
 https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack  
 https://newtype.pe.kr/entry/Grafana%EC%99%80-EFS-%EC%97%B0%EB%8F%99  
 https://stackoverflow.com/questions/67652819/grafana-pod-is-in-init-error-state-after-adding-an-existing-pvc
+
+## TroubleShooting 
+kube-prxoy에 대한 메트릭을 가져오지 못하는 경우 cm를 수정한다.
+```
+kubectl -n kube-system edit cm kube-proxy
+
+metricsBindAddress: 0.0.0.0:10249
+
+kubectl -n kube-system rollout restart daemonset/kube-proxy
+```
+
+https://ssnotebook.tistory.com/entry/Prometheus-Kube-Proxy-Metric-%ED%99%9C%EC%84%B1%ED%99%94  
