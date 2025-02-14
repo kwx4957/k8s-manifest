@@ -19,7 +19,7 @@ prometheus:
         metadata:
           name: prometheus-data
         spec:
-          storageClassName: nfs-client
+          storageClassName: nfs
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:s
@@ -34,7 +34,7 @@ grafana:
   persistence:
     enabled: true
     type: pvc
-    storageClassName: nfs-client
+    storageClassName: nfs
     accessModes:
       - ReadWriteOnce
     size: 20Gi    
