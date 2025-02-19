@@ -60,7 +60,7 @@ https://stackoverflow.com/questions/67652819/grafana-pod-is-in-init-error-state-
 
 ## TroubleShooting 
 kube-prxoy에 대한 메트릭을 가져오지 못하는 경우 cm를 수정한다.
-```
+```sh
 # Proxy Metrcis 설정
 kubectl -n kube-system edit cm kube-proxy
 metricsBindAddress: 0.0.0.0:10249
@@ -68,18 +68,24 @@ kubectl -n kube-system rollout restart daemonset/kube-proxy
 ```
 https://ssnotebook.tistory.com/entry/Prometheus-Kube-Proxy-Metric-%ED%99%9C%EC%84%B1%ED%99%94  
 
-ETCD(프로세스) 메트릭 가져오기
+---
+
+ETCD 시크릿 생성
 ```sh
 # ETCD 설정 파일 
 cat /etc/etcd.env
 
+# ETCD 통신을 위한 시크릿 생성
 kubectl create secret generic etcd-client-cert -n monitoring \
 --from-file=etcd-ca=/etc/ssl/etcd/ssl/ca.pem \
 --from-file=etcd-client=/etc/ssl/etcd/ssl/master.pem \
 --from-file=etcd-client-key=/etc/ssl/etcd/ssl/master-key.pem
+```
 
+정적 주소 기반의 ETCD(프로세스) 메트릭 가져오기
+```sh
 vi values.yaml
----
+
 kubeEtcd:
   enabled: true
   endpoints:
@@ -95,12 +101,47 @@ kubeEtcd:
     caFile: /etc/prometheus/secrets/etcd-client-cert/etcd-ca
     certFile: /etc/prometheus/secrets/etcd-client-cert/etcd-client
     keyFile: /etc/prometheus/secrets/etcd-client-cert/etcd-client-key
+    port: https-metrics
 
 prometheus:
   prometheusSpec:
     secrets:
     - etcd-client-cert
----
 ```
 https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack/templates/exporters/kube-etcd    
 https://www.sktenterprise.com/bizInsight/blogDetail/dev/2851
+
+---
+
+서비스 디스커버리를 통한 ETCD(프로세스) 메트릭 가져오기
+```sh
+vi values.yaml
+
+# 그라파나의 DasBoard에서 15308 import를 수행한다.
+kubeEtcd:
+  enabled: false
+
+prometheus:
+  prometheusSpec:
+    additionalScrapeConfigs:
+      - job_name: kube-etcd
+        kubernetes_sd_configs:
+          - role: node
+        scheme: https
+        tls_config:
+          ca_file:  /etc/prometheus/secrets/etcd-client-cert/etcd-ca
+          cert_file:  /etc/prometheus/secrets/etcd-client-cert/etcd-client
+          key_file:  /etc/prometheus/secrets/etcd-client-cert/etcd-client-key
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_node_label_master]
+            action: keep
+            regex: true
+          - source_labels: [__address__]
+            target_label: __address__
+            regex: ([^:;]+):(\d+)
+            replacement: ${1}:2379
+    secrets:
+      - etcd-client-cert
+```
+https://prometheus.io/docs/prometheus/latest/configuration/configuration/#kubernetes_sd_config  
+https://grafana.com/grafana/dashboards/15308-etcd-cluster-overview/  
