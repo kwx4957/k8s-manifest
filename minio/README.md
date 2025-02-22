@@ -7,7 +7,7 @@
 # minio operator install with helm
 helm repo add minio-operator https://operator.min.io
 helm repo update
-helm install operator minio-operator/operator \
+helm install operator minio-operator/operator --version 4.3.7\
   --namespace minio-operator --create-namespace
 
 # values.yaml 다운로드
