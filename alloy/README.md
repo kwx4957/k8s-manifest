@@ -7,7 +7,7 @@ helm show values grafana/alloy --version 0.12.0 > values.yaml
 // alloy는 하단 아래에 있다.
 vi config.alloy
 
-kubectl create configmap alloy-config "--from-file=config.alloy=./config.alloy" -n monitoring
+kubectl create configmap alloy-config "--from-file=config.alloy=./config.alloy"
 
 vi values.yaml
 ---
@@ -18,7 +18,7 @@ alloy:
     key: config.alloy
 ---
 
-helm upgrade alloy grafana/alloy -f alloy-values.yaml -n monitoring
+helm upgrade alloy grafana/alloy -f alloy-values.yaml
 ```
 ### Config.alloy
 ```
