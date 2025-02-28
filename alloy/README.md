@@ -16,6 +16,12 @@ alloy:
     create: false
     name: alloy-config
     key: config.alloy
+
+  mounts:
+    varlog: true
+
+  securityContext:
+    privileged: true
 ---
 
 helm upgrade alloy grafana/alloy -f alloy-values.yaml
@@ -178,7 +184,8 @@ https://grafana.com/docs/alloy/latest/set-up/install/kubernetes/
 
 [alloy 로그 설정]      
 https://grafana.com/docs/alloy/latest/collect/metamonitoring/#meta-monitoring-logs  
-https://grafana.com/docs/alloy/latest/collect/logs-in-kubernetes/  
+https://grafana.com/docs/alloy/latest/collect/logs-in-kubernetes/   
+https://github.com/brngates98/GrafanaAgents/blob/main/Alloy/alloy/config.alloy
 
 [alloy 문제 해결]   
 https://github.com/grafana/alloy/issues/1217  
