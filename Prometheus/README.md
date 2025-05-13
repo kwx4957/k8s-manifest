@@ -19,6 +19,9 @@ kube-state-metrics:
 prometheus:
   prometheusSpec:
     enableRemoteWriteReceiver: true
+    additionalArgs:
+      - name: web.enable-otlp-receiver
+        value: "" 
     storageSpec: 
       volumeClaimTemplate:
         metadata:
