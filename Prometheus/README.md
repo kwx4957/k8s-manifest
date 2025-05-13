@@ -18,6 +18,7 @@ kube-state-metrics:
 # 프로메테우스 볼륨 설정
 prometheus:
   prometheusSpec:
+    enableRemoteWriteReceiver: true
     storageSpec: 
       volumeClaimTemplate:
         metadata:
